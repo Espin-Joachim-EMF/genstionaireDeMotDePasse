@@ -17,14 +17,10 @@ public class App {
         System.out.println("Entrez un mot de passe");
         int password = scanner.nextInt();
 
-        String userNameTryConect = scanner.nextLine();
-        System.out.println("conectez vous, entrez votre nom d'utilisateur");
+        System.out.println("conectez vous, entrez votre identifiant");
+        String userNameTry = scanner.nextLine();
 
-
-        if (userNameTryConect == userName) {
-            System.out.println("ok");
-        } else {
-            System.out.println("nons");
-        }
+        System.out.println(userNameTry);
+        
     }
 }
