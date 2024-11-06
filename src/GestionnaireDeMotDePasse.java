@@ -7,17 +7,17 @@ import javax.swing.JOptionPane;
 public class GestionnaireDeMotDePasse {
 
     public static final char[] CHARACHTER = new char[] {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',    // Chiffres
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
-        'u', 'v', 'w', 'x', 'y', 'z',    // Lettres minuscules
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
-        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
-        'U', 'V', 'W', 'X', 'Y', 'Z',    // Lettres majuscules
-        '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', 
-        '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', 
-        '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', 
-        '}', '~'                         // Caractères spéciaux
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', // Chiffres
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z', // Lettres minuscules
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+            'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+            'U', 'V', 'W', 'X', 'Y', 'Z', // Lettres majuscules
+            '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*',
+            '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
+            '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|',
+            '}', '~' // Caractères spéciaux
     };
 
     private static HashMap<String, String> motsDePasseMap = new HashMap<>();
@@ -69,10 +69,17 @@ public class GestionnaireDeMotDePasse {
             case 1 -> JOptionPane.showMessageDialog(null, "En devloppement", "Dev", JOptionPane.ERROR_MESSAGE);
 
             case 2 -> {
-                String insert = JOptionPane.showInputDialog(null, "Quelle sera le taille de votre mot de passe ?");
+                String insert = JOptionPane.showInputDialog(null,
+                        "Quelle sera le taille de votre mot de passe ? (Entre 5 et 20)");
                 int tailleMdp = Integer.parseInt(insert);
-                motsDePasseMap.put(site, creeMdp(tailleMdp));
-                JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
+                if (tailleMdp >= 5 && tailleMdp <= 20) {
+                    motsDePasseMap.put(site, creeMdp(tailleMdp));
+                    JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Mot de passe trop petit ou trop grand.",
+                            "Ajoutez un mot de passe", JOptionPane.ERROR_MESSAGE);
+                }
+
             }
 
             default -> JOptionPane.showMessageDialog(null, "Choix Invalide", "Choix invalide",
