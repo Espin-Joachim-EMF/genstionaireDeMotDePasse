@@ -1,15 +1,33 @@
 import java.util.HashMap;
+import java.util.Random;
+import java.util.random.RandomGenerator;
+
 import javax.swing.JOptionPane;
 
 public class GestionnaireDeMotDePasse {
+
+    public static final char[] CHARACHTER = new char[] {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',    // Chiffres
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
+        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
+        'u', 'v', 'w', 'x', 'y', 'z',    // Lettres minuscules
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
+        'U', 'V', 'W', 'X', 'Y', 'Z',    // Lettres majuscules
+        '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', 
+        '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', 
+        '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', 
+        '}', '~'                         // Caractères spéciaux
+    };
 
     private static HashMap<String, String> motsDePasseMap = new HashMap<>();
 
     public static void main(String[] args) {
         boolean continuer = true;
         while (continuer) {
-            String[] option = { "Ajouter un mot de passe", "Afficher les mots de passe", "Rechercher un mot de passe","Supprimer un mots de passe",
-                    "Quitter"};
+            String[] option = { "Ajouter un mot de passe", "Afficher les mots de passe", "Rechercher un mot de passe",
+                    "Supprimer un mots de passe",
+                    "Quitter" };
             int choix = JOptionPane.showOptionDialog(null, "Choissiez une options", "Gestionnaire de mot de passe",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, option, option[0]);
 
@@ -18,7 +36,7 @@ public class GestionnaireDeMotDePasse {
                 case 1 -> afficherMotsDePasse();
                 case 2 -> cherchezMdp();
                 case 3 -> suprimerMdp();
-                case 4  -> {
+                case 4 -> {
                     continuer = false;
                 }
 
@@ -35,13 +53,32 @@ public class GestionnaireDeMotDePasse {
             JOptionPane.showMessageDialog(null, "le site de peut pas etre vide.");
             return;
         }
-        String motDePass = JOptionPane.showInputDialog(null, "Entrez le mot de passe");
-        if (motDePass == null || motDePass.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Le mot de passe ne peut pas etre vide");
-            return;
+        String[] options = { "Entrez le mot de passe", "Générer le mot de passse", "dev test" };
+        int choixMdp = JOptionPane.showOptionDialog(null, "choissisez une option.", "Crée un mot de passe ",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        switch (choixMdp) {
+            case 0 -> {
+                String motDePass = JOptionPane.showInputDialog(null, "Entrez le mot de passe");
+                if (motDePass == null || motDePass.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Le mot de passe ne peut pas etre vide");
+                    return;
+                }
+                motsDePasseMap.put(site, motDePass);
+                JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
+            }
+            case 1 -> JOptionPane.showMessageDialog(null, "En devloppement", "Dev", JOptionPane.ERROR_MESSAGE);
+
+            case 2 -> {
+                String insert = JOptionPane.showInputDialog(null, "Quelle sera le taille de votre mot de passe ?");
+                int tailleMdp = Integer.parseInt(insert);
+                motsDePasseMap.put(site, creeMdp(tailleMdp));
+                JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
+            }
+
+            default -> JOptionPane.showMessageDialog(null, "Choix Invalide", "Choix invalide",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         }
-        motsDePasseMap.put(site, motDePass);
-        JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
     }
 
     public static void afficherMotsDePasse() {
@@ -85,4 +122,16 @@ public class GestionnaireDeMotDePasse {
             return;
         }
     }
+
+    private static String creeMdp(int longeur) {
+        Random random = new Random();
+        StringBuilder motDePass = new StringBuilder();
+
+        for (int i = 0; i < longeur; i++) {
+            int index = random.nextInt(CHARACHTER.length);
+            motDePass.append(CHARACHTER[index]);
+        }
+        return motDePass.toString();
+    }
+
 }
