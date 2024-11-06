@@ -1,8 +1,12 @@
+import java.io.*;
 import java.util.HashMap;
 import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class GestionnaireDeMotDePasse {
+
+    public static final String ADMIN_PASSWORD = "motDePasseADMIN.txt";
+    private static final String FILE_PATH = "motsDePasseJavaPerso.txt"; 
 
     public static final char[] CHARACHTER = new char[] {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -17,13 +21,17 @@ public class GestionnaireDeMotDePasse {
             '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|',
             '}', '~'
     };
-
     public static final int MIN_PASSWORD_LENGTH = 5;
     public static final int MAX_PASSWORD_LENGTH = 25;
 
     private static HashMap<String, String> motsDePasseMap = new HashMap<>();
 
     public static void main(String[] args) {
+       /* if (!condition) {
+            JOptionPane.showMessageDialog(null,"Accès refusé. Mot de passe incorrect.");
+            return;
+        } */
+        chargerMotsDePasse();
         boolean continuer = true;
         while (continuer) {
             String[] option = {
@@ -32,7 +40,7 @@ public class GestionnaireDeMotDePasse {
                     "Rechercher un mot de passe",
                     "Supprimer un site et mot de passe",
             };
-            int choix = JOptionPane.showOptionDialog(null, "Choissiez une option", "Gestionnaire de mot de passe",
+            int choix = JOptionPane.showOptionDialog(null, "Choisissez une option", "Gestionnaire de mot de passe",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, option, option[0]);
 
             switch (choix) {
@@ -48,12 +56,12 @@ public class GestionnaireDeMotDePasse {
     private static void ajouterMotDePasse() {
         String site = JOptionPane.showInputDialog(null, "Entrez un site. exemple.com");
         if (site.isEmpty() || site == null) {
-            JOptionPane.showMessageDialog(null, "le site de peut pas etre vide.");
+            JOptionPane.showMessageDialog(null, "Le site ne peut pas être vide.");
             return;
         }
 
         String[] options = { "Entrez le mot de passe", "Générer le mot de passe" };
-        int choixMdp = JOptionPane.showOptionDialog(null, "choissisez une option.", "Créeation de mot de passe",
+        int choixMdp = JOptionPane.showOptionDialog(null, "Choisissez une option.", "Création de mot de passe",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
         switch (choixMdp) {
@@ -65,6 +73,7 @@ public class GestionnaireDeMotDePasse {
                     return;
                 }
                 motsDePasseMap.put(site, motDePass);
+                sauvegarderMotsDePasse();
                 JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " configuré avec succès.");
             }
 
@@ -77,6 +86,7 @@ public class GestionnaireDeMotDePasse {
                         return;
                     }
                     motsDePasseMap.put(site, genererMotDePasse(length));
+                    sauvegarderMotsDePasse(); 
                     JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " configuré avec succès.");
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Entrée invalide.");
@@ -101,7 +111,7 @@ public class GestionnaireDeMotDePasse {
 
     private static void afficherMotsDePasse() {
         if (motsDePasseMap.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistré.");
             return;
         }
         StringBuilder listeMotsDePasse = new StringBuilder("Mots de passe enregistrés :\n");
@@ -111,7 +121,7 @@ public class GestionnaireDeMotDePasse {
 
     private static void chercherMotDePasse() {
         if (motsDePasseMap.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistré.");
             return;
         }
         String site = JOptionPane.showInputDialog(null, "Entrez le nom du site");
@@ -124,7 +134,7 @@ public class GestionnaireDeMotDePasse {
 
     private static void supprimerSite() {
         if (motsDePasseMap.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistré.");
             return;
         }
         String site = JOptionPane.showInputDialog(null, "Entrez le nom du site à supprimer");
@@ -133,7 +143,31 @@ public class GestionnaireDeMotDePasse {
             return;
         }
         motsDePasseMap.remove(site);
-        JOptionPane.showMessageDialog(null, "Le site " + site + " à été supprimé avec succès.");
+        sauvegarderMotsDePasse(); 
+        JOptionPane.showMessageDialog(null, "Le site " + site + " a été supprimé avec succès.");
     }
 
+    private static void sauvegarderMotsDePasse() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
+            for (var entry : motsDePasseMap.entrySet()) {
+                writer.println(entry.getKey() + ":" + entry.getValue());
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Erreur de sauvegarde des mots de passe.");
+        }
+    }
+
+    private static void chargerMotsDePasse() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":", 2);
+                if (parts.length == 2) {
+                    motsDePasseMap.put(parts[0], parts[1]);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Aucun fichier de mots de passe trouvé. Un nouveau sera créé.");
+        }
+    }
 }
