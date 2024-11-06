@@ -1,144 +1,139 @@
 import java.util.HashMap;
 import java.util.Random;
-import java.util.random.RandomGenerator;
-
 import javax.swing.JOptionPane;
 
 public class GestionnaireDeMotDePasse {
 
     public static final char[] CHARACHTER = new char[] {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', // Chiffres
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-            'u', 'v', 'w', 'x', 'y', 'z', // Lettres minuscules
+            'u', 'v', 'w', 'x', 'y', 'z',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-            'U', 'V', 'W', 'X', 'Y', 'Z', // Lettres majuscules
+            'U', 'V', 'W', 'X', 'Y', 'Z',
             '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*',
             '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
             '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|',
-            '}', '~' // Caractères spéciaux
+            '}', '~'
     };
+
+    public static final int MIN_PASSWORD_LENGTH = 5;
+    public static final int MAX_PASSWORD_LENGTH = 25;
 
     private static HashMap<String, String> motsDePasseMap = new HashMap<>();
 
     public static void main(String[] args) {
         boolean continuer = true;
         while (continuer) {
-            String[] option = { "Ajouter un mot de passe", "Afficher les mots de passe", "Rechercher un mot de passe",
-                    "Supprimer un mots de passe",
-                    "Quitter" };
-            int choix = JOptionPane.showOptionDialog(null, "Choissiez une options", "Gestionnaire de mot de passe",
+            String[] option = {
+                    "Ajouter un mot de passe",
+                    "Afficher les mots de passe",
+                    "Rechercher un mot de passe",
+                    "Supprimer un site et mot de passe",
+            };
+            int choix = JOptionPane.showOptionDialog(null, "Choissiez une option", "Gestionnaire de mot de passe",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, option, option[0]);
 
             switch (choix) {
                 case 0 -> ajouterMotDePasse();
                 case 1 -> afficherMotsDePasse();
-                case 2 -> cherchezMdp();
-                case 3 -> suprimerMdp();
-                case 4 -> {
-                    continuer = false;
-                }
-
-                default -> JOptionPane.showMessageDialog(null, "Choix Invalide", "Choix invalide",
-                        JOptionPane.INFORMATION_MESSAGE);
+                case 2 -> chercherMotDePasse();
+                case 3 -> supprimerSite();
+                default -> continuer = false;
             }
         }
-
     }
 
     private static void ajouterMotDePasse() {
-        String site = JOptionPane.showInputDialog(null, "Entrez le site");
+        String site = JOptionPane.showInputDialog(null, "Entrez un site. exemple.com");
         if (site.isEmpty() || site == null) {
             JOptionPane.showMessageDialog(null, "le site de peut pas etre vide.");
             return;
         }
-        String[] options = { "Entrez le mot de passe", "Générer le mot de passse", "dev test" };
-        int choixMdp = JOptionPane.showOptionDialog(null, "choissisez une option.", "Crée un mot de passe ",
+
+        String[] options = { "Entrez le mot de passe", "Générer le mot de passe" };
+        int choixMdp = JOptionPane.showOptionDialog(null, "choissisez une option.", "Créeation de mot de passe",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
         switch (choixMdp) {
             case 0 -> {
                 String motDePass = JOptionPane.showInputDialog(null, "Entrez le mot de passe");
-                if (motDePass == null || motDePass.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Le mot de passe ne peut pas etre vide");
+                if (motDePass == null || motDePass.isEmpty() || !isPasswordLengthValid(motDePass.length())) {
+                    JOptionPane.showMessageDialog(null,
+                            "Mot de passe invalide (doit contenir entre 5 et 20 caractères).");
                     return;
                 }
                 motsDePasseMap.put(site, motDePass);
-                JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
+                JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " configuré avec succès.");
             }
-            case 1 -> JOptionPane.showMessageDialog(null, "En devloppement", "Dev", JOptionPane.ERROR_MESSAGE);
 
-            case 2 -> {
-                String insert = JOptionPane.showInputDialog(null,
-                        "Quelle sera le taille de votre mot de passe ? (Entre 5 et 20)");
-                int tailleMdp = Integer.parseInt(insert);
-                if (tailleMdp >= 5 && tailleMdp <= 20) {
-                    motsDePasseMap.put(site, creeMdp(tailleMdp));
-                    JOptionPane.showMessageDialog(null, "Le mot de passe pour " + site + " a bien été configurée.");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Mot de passe trop petit ou trop grand.",
-                            "Ajoutez un mot de passe", JOptionPane.ERROR_MESSAGE);
+            case 1 -> {
+                String input = JOptionPane.showInputDialog(null, "Taille du mot de passe (entre 5 et 20 caractères) ?");
+                try {
+                    int length = Integer.parseInt(input);
+                    if (!isPasswordLengthValid(length)) {
+                        JOptionPane.showMessageDialog(null, "Taille de mot de passe invalide.");
+                        return;
+                    }
+                    motsDePasseMap.put(site, genererMotDePasse(length));
+                    JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " configuré avec succès.");
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Entrée invalide.");
                 }
-
             }
-
-            default -> JOptionPane.showMessageDialog(null, "Choix Invalide", "Choix invalide",
-                    JOptionPane.INFORMATION_MESSAGE);
-
+            default -> JOptionPane.showMessageDialog(null, "Choix invalide");
         }
     }
 
-    public static void afficherMotsDePasse() {
-        if (motsDePasseMap.isEmpty() || motsDePasseMap == null) {
-            JOptionPane.showMessageDialog(null, "Aucun mot de passe engregistrée.", "Affichage des mots de passe",
-                    JOptionPane.INFORMATION_MESSAGE);
+    private static boolean isPasswordLengthValid(int length) {
+        return length >= MIN_PASSWORD_LENGTH && length <= MAX_PASSWORD_LENGTH;
+    }
+
+    private static String genererMotDePasse(int length) {
+        Random random = new Random();
+        StringBuilder motDePass = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            motDePass.append(CHARACHTER[random.nextInt(CHARACHTER.length)]);
+        }
+        return motDePass.toString();
+    }
+
+    private static void afficherMotsDePasse() {
+        if (motsDePasseMap.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
             return;
         }
-        StringBuilder listeMotsDePasse = new StringBuilder("Mot de passe ennregistrée :\n");
-        for (String site : motsDePasseMap.keySet()) {
-            listeMotsDePasse.append(site).append(" : ").append(motsDePasseMap.get(site)).append("\n");
-
-        }
+        StringBuilder listeMotsDePasse = new StringBuilder("Mots de passe enregistrés :\n");
+        motsDePasseMap.forEach((site, mdp) -> listeMotsDePasse.append(site).append(" : ").append(mdp).append("\n"));
         JOptionPane.showMessageDialog(null, listeMotsDePasse.toString());
-        return;
     }
 
-    private static void cherchezMdp() {
-        if (motsDePasseMap == null || motsDePasseMap.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Le nom du site ne peut pas être vide.");
+    private static void chercherMotDePasse() {
+        if (motsDePasseMap.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
             return;
         }
         String site = JOptionPane.showInputDialog(null, "Entrez le nom du site");
-
-        String motDePasse = motsDePasseMap.get(site);
-        if (motDePasse != null) {
-            JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " : " + motDePasse);
-        } else {
-            JOptionPane.showMessageDialog(null, "Auncun mot de pass trouvé pour " + site);
-        }
-    }
-
-    private static void suprimerMdp() {
-        String site = JOptionPane.showInputDialog(null,
-                "Entrez le nom du site au quelle vous voulez suprimmer le mot de passe");
-        if (motsDePasseMap.containsKey(site)) {
-            motsDePasseMap.remove(site);
-            JOptionPane.showMessageDialog(null, "Le mot de passe de " + site + " a bien été suprimer.");
-        } else {
-            JOptionPane.showMessageDialog(null, "Le site n'a pas été trouvée");
+        if (site == null || !motsDePasseMap.containsKey(site)) {
+            JOptionPane.showMessageDialog(null, "Site non trouvé");
             return;
         }
+        JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " : " + motsDePasseMap.get(site));
     }
 
-    private static String creeMdp(int longeur) {
-        Random random = new Random();
-        StringBuilder motDePass = new StringBuilder();
-
-        for (int i = 0; i < longeur; i++) {
-            int index = random.nextInt(CHARACHTER.length);
-            motDePass.append(CHARACHTER[index]);
+    private static void supprimerSite() {
+        if (motsDePasseMap.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Aucun mot de passe enregistrée.");
+            return;
         }
-        return motDePass.toString();
+        String site = JOptionPane.showInputDialog(null, "Entrez le nom du site à supprimer");
+        if (site == null || !motsDePasseMap.containsKey(site)) {
+            JOptionPane.showMessageDialog(null, "Site non trouvé.");
+            return;
+        }
+        motsDePasseMap.remove(site);
+        JOptionPane.showMessageDialog(null, "Le site " + site + " à été supprimé avec succès.");
     }
 
 }
