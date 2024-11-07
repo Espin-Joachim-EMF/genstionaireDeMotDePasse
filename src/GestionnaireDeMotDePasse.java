@@ -147,6 +147,7 @@ public class GestionnaireDeMotDePasse {
         JOptionPane.showMessageDialog(null, "Le site " + site + " a été supprimé avec succès.");
     }
 
+// chatgpt
     private static void sauvegarderMotsDePasse() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (var entry : motsDePasseMap.entrySet()) {
@@ -171,3 +172,4 @@ public class GestionnaireDeMotDePasse {
         }
     }
 }
+//fin chatgpt
