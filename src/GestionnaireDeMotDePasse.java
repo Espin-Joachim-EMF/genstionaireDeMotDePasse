@@ -4,7 +4,6 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class GestionnaireDeMotDePasse {
-    this.getFrame().setIconImage(new imageIcon(getClass().getClassLoader().getResource("PlagiaLyzerIcon.png")));
 
     public static final String ADMIN_PASSWORD = "motDePasseADMIN.txt";
     private static final String FILE_PATH = "motsDePasseJavaPerso.txt";
