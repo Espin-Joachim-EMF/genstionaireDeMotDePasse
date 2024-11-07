@@ -4,9 +4,10 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class GestionnaireDeMotDePasse {
+    this.getFrame().setIconImage(new imageIcon(getClass().getClassLoader().getResource("PlagiaLyzerIcon.png")));
 
     public static final String ADMIN_PASSWORD = "motDePasseADMIN.txt";
-    private static final String FILE_PATH = "motsDePasseJavaPerso.txt"; 
+    private static final String FILE_PATH = "motsDePasseJavaPerso.txt";
 
     public static final char[] CHARACHTER = new char[] {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -27,10 +28,10 @@ public class GestionnaireDeMotDePasse {
     private static HashMap<String, String> motsDePasseMap = new HashMap<>();
 
     public static void main(String[] args) {
-       /* if (!condition) {
+        if (!verifierMotDePasseAdmin()) {
             JOptionPane.showMessageDialog(null,"Accès refusé. Mot de passe incorrect.");
             return;
-        } */
+        } 
         chargerMotsDePasse();
         boolean continuer = true;
         while (continuer) {
@@ -51,6 +52,36 @@ public class GestionnaireDeMotDePasse {
                 default -> continuer = false;
             }
         }
+    }
+
+    // chat gpt
+    private static boolean verifierMotDePasseAdmin() {
+        File file = new File(ADMIN_PASSWORD);
+        String masterMdp = "";
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+                masterMdp = reader.readLine();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null,"Erreur lors de l'enregistrement du mot de passe.");
+                return false;
+              }    
+        }else{
+            String SetMasterMdp = JOptionPane.showInputDialog("Definire un mot de passe admin :");
+            if (SetMasterMdp != null && !SetMasterMdp.isEmpty()) {
+                try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+                    writer.println(SetMasterMdp);
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null, "Erreur lors de l'enregistrement du mot de passe.");
+                    return false;
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Mot de passe invalide. L'application va se fermer.");
+                return false;
+            }
+        }
+
+        String inputMasterMdp = JOptionPane.showInputDialog("Entrez le mot de passe admin pour accéder au gestionnaire:");
+        return inputMasterMdp != null && inputMasterMdp.equals(masterMdp);
     }
 
     private static void ajouterMotDePasse() {
@@ -86,7 +117,7 @@ public class GestionnaireDeMotDePasse {
                         return;
                     }
                     motsDePasseMap.put(site, genererMotDePasse(length));
-                    sauvegarderMotsDePasse(); 
+                    sauvegarderMotsDePasse();
                     JOptionPane.showMessageDialog(null, "Mot de passe pour " + site + " configuré avec succès.");
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Entrée invalide.");
@@ -143,10 +174,11 @@ public class GestionnaireDeMotDePasse {
             return;
         }
         motsDePasseMap.remove(site);
-        sauvegarderMotsDePasse(); 
+        sauvegarderMotsDePasse();
         JOptionPane.showMessageDialog(null, "Le site " + site + " a été supprimé avec succès.");
     }
 
+    // chatgpt
     private static void sauvegarderMotsDePasse() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             for (var entry : motsDePasseMap.entrySet()) {
@@ -171,3 +203,4 @@ public class GestionnaireDeMotDePasse {
         }
     }
 }
+// fin chatgpt
